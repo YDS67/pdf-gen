@@ -8,10 +8,11 @@ import (
 
 func main() {
 
-	var mgl = 20.0;
-	var mgr = 15.0;
-	var pgw = 210.0 - mgl - mgr;
+	var mgl = 20.0
+	var mgr = 15.0
+	var pgw = 210.0 - mgl - mgr
 	var spw0 = 0.1
+	var lnht = 7.0
 
 	var paragraph1 strings.Builder
 
@@ -24,7 +25,7 @@ func main() {
 	pdf.SetLineWidth(0.5)
 	pdf.AddPage()
 	pdf.SetFont("Times", "B", 16)
-	pdf.CellFormat(pgw, 10, "Title", "", 2, "CT", false, 0, "")
+	pdf.CellFormat(pgw, 2*lnht, "Title", "", 2, "CT", false, 0, "")
 	pdf.SetFont("Times", "", 14)
 	lines := pdf.SplitText(paragraph1.String(), pgw)
 	lnm := len(lines)
@@ -38,7 +39,7 @@ func main() {
 			spw = spw0
 		}
 		pdf.SetWordSpacing(spw)
-		pdf.CellFormat(pgw, 5, lines[j], "", 2, "LT", false, 0, "")
+		pdf.CellFormat(pgw, lnht, lines[j], "", 2, "LT", false, 0, "")
 	}
 	pdf.AddPage()
 	err := pdf.OutputFileAndClose("hello.pdf")
