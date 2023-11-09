@@ -23,10 +23,13 @@ func main() {
 	pdf.SetTopMargin(pp.mgt)
 	pdf.AddPage()
 
+	pdf.SetTextColor(0,55,165)
 	add_main_title(pdf, pp, "Main Title")
+	pdf.SetTextColor(0,0,0)
 	add_paragraph(pdf, pp, paragraph1.String())
+	pdf.SetTextColor(0,55,165)
 	add_paragraph(pdf, pp, paragraph1.String())
-
+	pdf.SetTextColor(0,0,0)
 	for i := 1; i<20; i++ {
 		add_title(pdf, pp, "Title")
 		add_paragraph(pdf, pp, paragraph1.String())
@@ -71,9 +74,12 @@ func add_paragraph(pdf *fpdf.Fpdf, pp PageParams, text string) {
 	for j := range lines {
 		pos := pdf.GetY()
 		if pos > pp.pgh-pp.lht {
+			cr, cg, cb := pdf.GetTextColor()
 			pdf.SetFont("Times", "", 14)
+			pdf.SetTextColor(0,0,0)
 			pdf.CellFormat(pp.pgw, 2*pp.lht, fmt.Sprint(pdf.PageNo()), "", 2, "CB", false, 0, "")
 			pdf.AddPage()
+			pdf.SetTextColor(cr,cg,cb)
 		}
 		spn := float64(strings.Count(lines[j], " "))
 		len := pdf.GetStringWidth(lines[j])
