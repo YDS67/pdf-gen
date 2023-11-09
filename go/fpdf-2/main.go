@@ -1,16 +1,16 @@
 package main
 
 import (
-	"github.com/go-pdf/fpdf"
 	"fmt"
+	"github.com/go-pdf/fpdf"
 	"strings"
 )
 
 func main() {
 
 	var pp PageParams
-	
-	pp = pp.new(20,15,20,7)
+
+	pp = pp.new(20, 15, 20, 7)
 
 	var paragraph1 strings.Builder
 
@@ -22,17 +22,18 @@ func main() {
 	pdf.SetRightMargin(pp.mgr)
 	pdf.SetTopMargin(pp.mgt)
 	pdf.AddPage()
+
+	add_main_title(pdf, pp, "Main Title")
+	add_paragraph(pdf, pp, paragraph1.String())
+	add_paragraph(pdf, pp, paragraph1.String())
+
+	for i := 1; i<20; i++ {
+		add_title(pdf, pp, "Title")
+		add_paragraph(pdf, pp, paragraph1.String())
+		add_paragraph(pdf, pp, paragraph1.String())
+	}
 	
-	
-	add_title(pdf, pp, "Title")
-	add_paragraph(pdf, pp, paragraph1.String())
-	add_title(pdf, pp, "Title")
-	add_paragraph(pdf, pp, paragraph1.String())
-	add_title(pdf, pp, "Title")
-	add_paragraph(pdf, pp, paragraph1.String())
-	add_paragraph(pdf, pp, paragraph1.String())
-	add_paragraph(pdf, pp, paragraph1.String())
-	
+
 	err := pdf.OutputFileAndClose("hello.pdf")
 	if err != nil {
 		fmt.Print("Can't create file")
@@ -40,26 +41,26 @@ func main() {
 }
 
 type PageParams struct {
-	mgl float64
-	mgr float64
-	mgt float64
-	pgw float64
-	pgh float64
+	mgl  float64
+	mgr  float64
+	mgt  float64
+	pgw  float64
+	pgh  float64
 	spw0 float64
-	lht float64
-	tht float64
+	lht  float64
+	tht  float64
 }
 
-func (pp PageParams)new(mgl, mgr, mgt, lht float64) PageParams {
-	return PageParams {
-		mgl: mgl,
-		mgr: mgr,
-		mgt: mgt,
-		pgw: 210.0 - mgl - mgr,
-		pgh: 297.0 - 2.0*mgt,
+func (pp PageParams) new(mgl, mgr, mgt, lht float64) PageParams {
+	return PageParams{
+		mgl:  mgl,
+		mgr:  mgr,
+		mgt:  mgt,
+		pgw:  210.0 - mgl - mgr,
+		pgh:  297.0 - 2.0*mgt,
 		spw0: 0.1, // do not change
-		lht: lht,
-		tht: 1.5*lht,
+		lht:  lht,
+		tht:  1.5 * lht,
 	}
 }
 
@@ -69,25 +70,40 @@ func add_paragraph(pdf *fpdf.Fpdf, pp PageParams, text string) {
 	lnm := len(lines)
 	for j := range lines {
 		pos := pdf.GetY()
-		if pos > pp.pgh - pp.lht {
+		if pos > pp.pgh-pp.lht {
+			pdf.SetFont("Times", "", 14)
+			pdf.CellFormat(pp.pgw, 2*pp.lht, fmt.Sprint(pdf.PageNo()), "", 2, "CB", false, 0, "")
 			pdf.AddPage()
 		}
 		spn := float64(strings.Count(lines[j], " "))
 		len := pdf.GetStringWidth(lines[j])
 		spl := pp.spw0 * spn
-		dl := pp.pgw-len
-		spw := pp.spw0 * (spl + dl)/spl
+		dl := pp.pgw - len
+		spw := pp.spw0 * (spl + dl) / spl
 		lht := pp.lht
 		if j == lnm-1 {
 			spw = pp.spw0
 			lht = pp.tht
 		}
+		pdf.SetFont("Times", "", 14)
 		pdf.SetWordSpacing(spw)
 		pdf.CellFormat(pp.pgw, lht, lines[j], "", 2, "LT", false, 0, "")
 	}
 }
 
 func add_title(pdf *fpdf.Fpdf, pp PageParams, text string) {
+	pos := pdf.GetY()
+		if pos > pp.pgh-pp.lht {
+			pdf.SetFont("Times", "", 14)
+			pdf.CellFormat(pp.pgw, 2*pp.lht, fmt.Sprint(pdf.PageNo()), "", 2, "CB", false, 0, "")
+			pdf.AddPage()
+		}
 	pdf.SetFont("Times", "B", 16)
 	pdf.CellFormat(pp.pgw, pp.tht, text, "", 2, "CT", false, 0, "")
 }
+
+func add_main_title(pdf *fpdf.Fpdf, pp PageParams, text string) {
+	pdf.SetFont("Times", "UB", 18)
+	pdf.CellFormat(pp.pgw, 2.0*pp.tht, text, "", 2, "CM", false, 0, "")
+}
+
